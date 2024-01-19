@@ -4,6 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { CardModule } from './card/card.module';
+import { TaskModule } from './task/task.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -23,8 +27,13 @@ import { JwtModule } from '@nestjs/jwt';
   ,
   UserModule,
   JwtModule,
-  AuthModule],
+  AuthModule,
+  CardModule,
+  TaskModule],
   controllers: [],
-  providers: [],
+  providers: [{
+    provide: APP_GUARD,
+    useClass: RolesGuard,
+  }],
 })
 export class AppModule {}
