@@ -5,12 +5,14 @@ import { ReturnUserDto } from 'src/user/dtos/returnUser.dto';
 export class ReturnCard {
   id: number;
   name: string;
+  color: string;
   amountTasks?: number;
   tasks?: ReturnTask[];
 
   constructor(cardEntity: CardEntity, amountTasks?: number) {
     this.id = cardEntity.id;
     this.name = cardEntity.name;
+    this.color = cardEntity.color;
     this.amountTasks = amountTasks;
     this.tasks = cardEntity.tasks
       ? cardEntity.tasks.map((product) => new ReturnTask(product))

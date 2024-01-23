@@ -95,7 +95,7 @@ export class CardService {
         const card = await this.findCardById(cardId, true);
         // Verifica se a categoria tem produtos associados antes de deletar
         if (card.tasks?.length > 0) {
-            throw new BadRequestException('Categoria com produtos')
+            throw new BadRequestException('Card com tarefas disponíveis. Por favor remova as tarefas antes de excluir o Card!')
         }
         // Deleta a categoria do banco de dados
         return this.cardRepository.delete({ id: cardId })

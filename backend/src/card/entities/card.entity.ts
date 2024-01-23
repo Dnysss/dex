@@ -12,6 +12,12 @@ export class CardEntity {
     @Column({ name: 'user_id', nullable: false})
     userId: number;
 
+    @Column({ name: 'category_id', nullable: false})
+    categoryId: number;
+
+    @Column({ name: 'color', nullable: false })
+    color: string;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 

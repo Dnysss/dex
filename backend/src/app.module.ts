@@ -8,6 +8,7 @@ import { CardModule } from './card/card.module';
 import { TaskModule } from './task/task.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards/roles.guard';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -29,7 +30,8 @@ import { RolesGuard } from './guards/roles.guard';
   JwtModule,
   AuthModule,
   CardModule,
-  TaskModule],
+  TaskModule,
+  CategoryModule],
   controllers: [],
   providers: [{
     provide: APP_GUARD,
