@@ -1,13 +1,15 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { LoginPayload } from '../auth/dtos/loginPayload.dto';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { UserType } from '../user/enum/user-type.enum';
+import { authorizationToLoginPayload } from 'src/utils/base-64-converter';
 
-//função para verificar se um usuário possui "roles" necessárias para acessar determinado recurso ou rota.
 @Injectable()
 export class RolesGuard implements CanActivate {
+  private readonly logger = new Logger(RolesGuard.name);
+
   constructor(
     private reflector: Reflector,
     private readonly jwtService: JwtService,
@@ -23,19 +25,37 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const { authorization } = context.switchToHttp().getRequest().headers;
+    const request = context.switchToHttp().getRequest();
+    const { authorization } = request.headers;
 
-//verificar a validade do token e obter os dados do payload
-    const loginPayload: LoginPayload | undefined = await this.jwtService
-      .verifyAsync(authorization, {
-        secret: process.env.JWT_SECRET,
-      })
-      .catch(() => undefined);
-
-    if (!loginPayload) {
+    if (!authorization) {
+      this.logger.warn('Authorization header is missing');
       return false;
     }
-    
-    return requiredRoles.some((role) => role === loginPayload.typeUser);
+
+    const token = authorization.split(' ')[1];
+    const loginPayload: LoginPayload | undefined = authorizationToLoginPayload(authorization);
+
+    if (!loginPayload) {
+      this.logger.warn('Invalid token payload');
+      return false;
+    }
+
+    try {
+      await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
+    } catch (error) {
+      this.logger.warn('Token verification failed');
+      return false;
+    }
+
+    const hasRole = requiredRoles.some((role) => role === loginPayload.typeUser);
+
+    if (!hasRole) {
+      this.logger.warn(`User does not have the required roles: ${requiredRoles}`);
+    }
+
+    return hasRole;
   }
 }
