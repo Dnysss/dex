@@ -4,7 +4,9 @@ import Character from "./../../../../public/background.png";
 import { IoEyeSharp } from "react-icons/io5";
 import { MdEmail } from "react-icons/md";
 
+// Components
 import Input from "../../components/inputs/Input";
+import Button from "../../components/buttons/Button";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -73,12 +75,7 @@ const Login = () => {
               >
                 Forgot password?
               </a>
-              <button
-                type="submit"
-                className="mb-7 w-full rounded-lg bg-indigo-600 p-3 text-white hover:bg-indigo-700 shadow-2xl shadow-indigo-500 transition duration-300"
-              >
-                Login
-              </button>
+              <Button type="submit">Login</Button>
             </form>
           </div>
         </div>
