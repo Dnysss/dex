@@ -11,6 +11,10 @@ import { Repository } from 'typeorm';
 import { UserType } from './enum/user-type.enum';
 import { UpdatePasswordDTO } from './dtos/update-password.dto';
 import { createPasswordHashed, vaildatePassword } from '../utils/password';
+import { JwtService } from '@nestjs/jwt';
+import { LoginPayload } from 'src/auth/dtos/loginPayload.dto';
+import { ReturnUserDto } from './dtos/returnUser.dto';
+import { ReturnLogin } from 'src/auth/dtos/returnLogin.dto';
 
 @Injectable()
 export class UserService {
@@ -18,13 +22,14 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly jwtService: JwtService,
   ) {}
-  
+
   // Método para criar um novo usuário
   async createUser(
     createUserDTO: createUserDTO,
     userType?: number,
-  ): Promise<UserEntity> {
+  ): Promise<ReturnLogin> {
     const user = await this.findUserByEmail(createUserDTO.email).catch(
       () => undefined,
     );
@@ -37,28 +42,21 @@ export class UserService {
     // Criar hash da senha e salvar o novo usuário no banco de dados
     const passwordHashed = await createPasswordHashed(createUserDTO.password);
 
-    return this.userRepository.save({
+    const newUser = await this.userRepository.save({
       ...createUserDTO,
       typeUser: userType ? userType : UserType.User,
       password: passwordHashed,
     });
+
+    return {
+      accessToken: this.jwtService.sign({
+        ...new LoginPayload(newUser),
+      }),
+      user: new ReturnUserDto(newUser),
+    };
   }
-  // Método para obter um usuário com informações detalhadas usando relações
-  /* async getUserByUsingRelations(userId: number): Promise<UserEntity> {
-    return this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-      relations: {
-        address: {
-          city: {
-            state: true,
-          },
-        },
-      },
-    });
-  } */
-// Método para obter todos os usuários
+
+  // Método para obter todos os usuários
   async getAllUsers(): Promise<UserEntity[]> {
     return this.userRepository.find();
   }
@@ -89,27 +87,27 @@ export class UserService {
 
     return user;
   }
-// Método para atualizar a senha do usuário
+  // Método para atualizar a senha do usuário
   async updatePasswordUser(
     updatePasswordDTO: UpdatePasswordDTO,
     userId: number,
   ): Promise<UserEntity> {
     // Encontrar o usuário pelo ID
     const user = await this.findUserById(userId);
-// Criar hash da nova senha
+    // Criar hash da nova senha
     const passwordHashed = await createPasswordHashed(
       updatePasswordDTO.newPassword,
     );
-// Validar a senha antiga
+    // Validar a senha antiga
     const isMatch = await vaildatePassword(
       updatePasswordDTO.lastPassword,
       user.password || '',
     );
-// Se a senha antiga não for válida, lançar uma exceção
+    // Se a senha antiga não for válida, lançar uma exceção
     if (!isMatch) {
       throw new BadRequestException('Senha inválida');
     }
-// Atualizar a senha do usuário no banco de dados
+    // Atualizar a senha do usuário no banco de dados
     return this.userRepository.save({
       ...user,
       password: passwordHashed,
