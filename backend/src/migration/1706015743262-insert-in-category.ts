@@ -13,8 +13,9 @@ export class InsertInCategory1706015743262 implements MigrationInterface {
             INSERT INTO category("id", "name", "icon") VALUES (7, 'Prioridades', 'priorities');
             INSERT INTO category("id", "name", "icon") VALUES (8, 'Projetos', 'projects');
             INSERT INTO category("id", "name", "icon") VALUES (9, 'Viagem', 'travel');
-            INSERT INTO category("id", "name", "icon") VALUES (10, 'Outro', 'other');
-            INSERT INTO category("id", "name", "icon") VALUES (11, 'Trabalho', 'work');
+            INSERT INTO category("id", "name", "icon") VALUES (10, 'Mercado', 'grocery');
+            INSERT INTO category("id", "name", "icon") VALUES (11, 'Transporte', 'transport');
+            INSERT INTO category("id", "name", "icon") VALUES (12, 'Outro', 'other');
         `)
     }
 

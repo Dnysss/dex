@@ -5,7 +5,7 @@ import Logo from "/logo.svg";
 export function AuthLayout() {
   return (
     <div className="flex h-screen items-center justify-center">
-      <div className="flex w-full max-w-4xl h-3/4">
+      <div className="flex w-full max-w-4xl">
         <div className="relative flex w-full md:w-1/2 flex-col p-8">
           <div className="flex flex-col items-start justify-center py-4">
             <div className="mb-8">
